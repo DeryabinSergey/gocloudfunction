@@ -1,0 +1,9 @@
+.github
+.git
+.idea
+cmd
+
+.gcloudignore
+.gitignore
+gha-creds-*.json
+README.md

@@ -1,0 +1,53 @@
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  job_id:
+    name: Deploy to Cloud Run
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+#      - uses: 'actions/checkout@v3'
+#
+#      - id: 'auth'
+#        uses: 'google-github-actions/auth@v1'
+#        with:
+#          workload_identity_provider: 'projects/379297460944/locations/global/workloadIdentityPools/global-pool/providers/github'
+#          service_account: 'deploy@deriabin-cloud-example.iam.gserviceaccount.com'
+#
+#      - id: 'deploy'
+#        uses: 'google-github-actions/deploy-cloud-functions@v1'
+#        with:
+#          name: 'DeriabinHelloHttp'
+#          runtime: 'go120'
+#          entry_point: 'HelloHttp'
+#          memory_mb: '128'
+#          region: 'europe-west3'
+#          https_trigger_security_level: 'secure_always'
+      # Example of using the output
+#      - id: 'test'
+#        run: 'curl "${{ steps.deploy.outputs.url }}"'
+      - uses: 'actions/checkout@v3'
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/379297460944/locations/global/workloadIdentityPools/global-pool/providers/github'
+          service_account: 'deploy@deriabin-cloud-example.iam.gserviceaccount.com'
+          token_format: 'access_token'
+      - id: 'setup'
+        name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          version: '>= 363.0.0'
+#      - id: 'info'
+#        name: 'Use gcloud CLI'
+#        run: 'gcloud info'
+      - id: 'deploy'
+        name: 'Use to deploy a cloud function gen 2'
+        run: 'gcloud functions deploy --gen2 --runtime=go120 --region=europe-west3 --trigger-http --allow-unauthenticated --entry-point=HelloHTTP --memory=128Mi --timeout=3s --service-account=deriabin-cloud-example@appspot.gserviceaccount.com DeriabinHelloHttp'
